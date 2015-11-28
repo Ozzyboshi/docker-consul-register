@@ -1,0 +1,42 @@
+
+#!/usr/bin/python
+
+import consul
+import sys
+from urlparse import urlparse
+
+consul_host = "{{ .Env.CONSUL_HOST }}"
+if not consul_host:
+    print "CONSUL_HOST not set"
+    sys.exit(1)
+
+port = 8500
+host = consul_host
+ttl=15
+
+if ":" in consul_host:
+    host, port = consul_host.split(":")
+
+client = consul.Consul(host=host, port=int(port))
+
+index,data=client.kv.get('backends/')
+if data==None :
+	client.kv.put('backends/',None)
+
+{{ $local := . }}
+{{range $key, $value := .}}
+{{ $addrLen := len $value.Addresses }}
+{{ if eq $addrLen 1 }}
+{{ with $address := index $value.Addresses 0 }}
+
+{{ if $address.HostPort}}
+# {{ $value.Name }}
+
+session_id=client.session.create(ttl=int(ttl),behavior='delete')
+client.kv.put("backends/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}", "{{ $local.Env.HOST_IP }}:{{ $address.HostPort }}",acquire=session_id)
+client.kv.put("backends/{{ $value.Image.Repository}}/port", "{{ $address.Port }}",acquire=session_id)
+
+{{ end }}
+{{ end }}
+{{end}}
+{{end}}
