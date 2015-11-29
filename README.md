@@ -1,16 +1,16 @@
-docker-register sets up a container running [docker-gen][1].  docker-gen dynamically generate a
+docker-consul-register sets up a container running [docker-gen][1].  docker-gen dynamically generates a
 python script when containers are started and stopped.  This generated script registers the running
 containers host IP and port in consul with a TTL.  It works in tandem with docker-discover which
 generates haproxy routes on the host to forward requests to registered containers.
 
 Together, they implement [service discovery][2] for docker containers with a similar architecture
-to [SmartStack][3]. docker-register is analagous to [nerve][4] in the SmartStack system.
+to [SmartStack][3]. docker-consul-register is analagous to [nerve][4] in the SmartStack system.
 
 ### Usage
 
 To run it:
 
-    $ docker run -d -e HOST_IP=1.2.3.4 -e CONSUL_HOST=1.2.3.4:4001 -v /var/run/docker.sock:/var/run/docker.sock -t jwilder/docker-register
+    $ docker run -d -e HOST_IP=1.2.3.4 -e CONSUL_HOST=1.2.3.4:4001 -v /var/run/docker.sock:/var/run/docker.sock -t ozzyboshi/docker-consul-register
 
 Then start any containers you want to be discoverable and publish their exposed port to the host.
 
@@ -30,10 +30,7 @@ over port 80, then one will need to use a port 80 and the other a different port
 
 
 [1]: https://github.com/jwilder/docker-gen
-[2]: http://jasonwilder.com/blog/2014/02/04/service-discovery-in-the-cloud/
-[3]: http://nerds.airbnb.com/smartstack-service-discovery-cloud/
-[4]: https://github.com/airbnb/nerve
-[5]: http://jasonwilder.com/blog/2014/07/15/docker-service-discovery/
+[2]: http://jasonwilder.com/blog/2014/07/15/docker-service-discovery/
 
 ### TODO
 
