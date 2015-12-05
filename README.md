@@ -10,7 +10,7 @@ to [SmartStack][3]. docker-consul-register is analagous to [nerve][4] in the Sma
 
 To run it:
 
-    $ docker run -d -e HOST_IP=1.2.3.4 -e CONSUL_HOST=1.2.3.4:4001 -v /var/run/docker.sock:/var/run/docker.sock -t ozzyboshi/docker-consul-register
+    $ docker run -d -e HOST_IP=1.2.3.4 -e CONSUL_HOST=1.2.3.4:8500 -v /var/run/docker.sock:/var/run/docker.sock -t ozzyboshi/docker-consul-register
 
 Then start any containers you want to be discoverable and publish their exposed port to the host.
 
