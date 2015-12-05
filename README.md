@@ -37,4 +37,3 @@ over port 80, then one will need to use a port 80 and the other a different port
 * Support http, udp proxying
 * Support multiple ports
 * Make CONSUL prefix configurable
-* Support other backends (zookeeper, redis, etc.)
