@@ -8,7 +8,7 @@ RUN mkdir /app
 WORKDIR /app
 
 RUN wget https://github.com/jwilder/docker-gen/releases/download/0.4.3/docker-gen-linux-amd64-0.4.3.tar.gz
-RUN tar xvzf docker-gen-linux-amd64-0.3.3.tar.gz -C /usr/local/bin
+RUN tar xvzf docker-gen-linux-amd64-0.4.3.tar.gz -C /usr/local/bin
 
 RUN pip install python-consul
 
