@@ -1,4 +1,3 @@
-
 #!/usr/bin/python
 
 import consul
@@ -26,17 +25,30 @@ if data==None :
 {{ $local := . }}
 {{range $key, $value := .}}
 {{ $addrLen := len $value.Addresses }}
-{{ if eq $addrLen 1 }}
-{{ with $address := index $value.Addresses 0 }}
+  {{ if eq $addrLen 1 }}
+    {{ with $address := index $value.Addresses 0 }}
+      {{ if $local.Env.CONTAINER_LABELNAME }}
+        {{range $key2, $value2 := $value.Labels}}
+          {{ if eq $key2 $local.Env.CONTAINER_LABELNAME }}
+            {{ if eq $value2 $local.Env.CONTAINER_LABELVALUE }}
 
-{{ if $address.HostPort}}
-# {{ $value.Name }}
-
-session_id=client.session.create(ttl=int(ttl),behavior='delete')
-client.kv.put("backends/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}", "{{ $local.Env.HOST_IP }}:{{ $address.HostPort }}",acquire=session_id)
-client.kv.put("backends/{{ $value.Image.Repository}}/port", "{{ $address.Port }}",acquire=session_id)
-
+index,data=client.kv.get("backends/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}")
+if data==None :
+	session_id=client.session.create(ttl=int(ttl),behavior='delete')
+	client.kv.put("backends/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}", "{{ $value.Name }}:{{ $address.Port }}",acquire=session_id)
+else :
+	client.session.renew(data['Session'])
+            {{ end }}
+          {{ end }}
+        {{ end }}
+      {{ else }}
+index,data=client.kv.get("backends/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}")
+if data==None :
+  session_id=client.session.create(ttl=int(ttl),behavior='delete')
+  client.kv.put("backends/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}", "{{ $value.Name }}:{{ $address.Port }}",acquire=session_id)
+else :
+  client.session.renew(data['Session'])
+      {{ end }}
+    {{ end }}
+  {{ end }}
 {{ end }}
-{{ end }}
-{{end}}
-{{end}}
