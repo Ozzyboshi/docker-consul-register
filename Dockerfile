@@ -2,7 +2,7 @@ FROM ubuntu:14.04
 MAINTAINER Alessio Garzi <gun101@email.it>
 
 RUN apt-get update
-RUN apt-get install -y wget python python-pip python-dev libssl-dev libffi-dev bash
+RUN apt-get install -y wget python python-pip python-dev libssl-dev libffi-dev bash timelimit
 
 RUN mkdir /app
 WORKDIR /app
@@ -16,4 +16,4 @@ ADD . /app
 
 ENV DOCKER_HOST unix:///var/run/docker.sock
 
-CMD docker-gen -interval 10 -watch -notify "python /tmp/register.py" consul.tmpl /tmp/register.py
+CMD docker-gen -interval 10 -watch -notify "timelimit -t 15 python /tmp/register.py" consul.tmpl /tmp/register.py
