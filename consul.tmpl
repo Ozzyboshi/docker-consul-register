@@ -18,9 +18,9 @@ if ":" in consul_host:
 
 client = consul.Consul(host=host, port=int(port))
 
-index,data=client.kv.get('backends/')
+index,data=client.kv.get('{{ .Env.CONSUL_DIR }}/')
 if data==None :
-	client.kv.put('backends/',None)
+	client.kv.put('{{ .Env.CONSUL_DIR }}/',None)
 
 {{ $local := . }}
 {{range $key, $value := .}}
@@ -32,20 +32,20 @@ if data==None :
           {{ if eq $key2 $local.Env.CONTAINER_LABELNAME }}
             {{ if eq $value2 $local.Env.CONTAINER_LABELVALUE }}
 
-index,data=client.kv.get("backends/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}")
+index,data=client.kv.get("{{ .Env.CONSUL_DIR }}/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}")
 if data==None :
 	session_id=client.session.create(ttl=int(ttl),behavior='delete')
-	client.kv.put("backends/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}", "{{ $value.Name }}:{{ $address.Port }}",acquire=session_id)
+	client.kv.put("{{ .Env.CONSUL_DIR }}/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}", "{{ $value.Name }}:{{ $address.Port }}",acquire=session_id)
 else :
 	client.session.renew(data['Session'])
             {{ end }}
           {{ end }}
         {{ end }}
       {{ else }}
-index,data=client.kv.get("backends/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}")
+index,data=client.kv.get("{{ .Env.CONSUL_DIR }}/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}")
 if data==None :
   session_id=client.session.create(ttl=int(ttl),behavior='delete')
-  client.kv.put("backends/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}", "{{ $value.Name }}:{{ $address.Port }}",acquire=session_id)
+  client.kv.put("{{ .Env.CONSUL_DIR }}/{{ $value.Image.Repository}}/{{printf "%.*s" 12 $value.ID}}", "{{ $value.Name }}:{{ $address.Port }}",acquire=session_id)
 else :
   client.session.renew(data['Session'])
       {{ end }}
